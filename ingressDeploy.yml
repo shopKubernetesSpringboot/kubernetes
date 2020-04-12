@@ -1,0 +1,32 @@
+#Main ingress
+#https://kubernetes.io/docs/concepts/services-networking/ingress/
+#todo session dont work with ingress, seems that it has to be implemented with loadBalance service, but how mix with uri proxying?
+#https://stackoverflow.com/questions/59272484/sticky-sessions-on-kubernetes-cluster
+#https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: shop-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "session"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "X-XSRF-TOKEN,Accept,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    nginx.ingress.kubernetes.io/session-cookie-path: /cart
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /product
+            backend:
+              serviceName: product-svc
+              servicePort: 80
+          - path: /cart
+            backend:
+              serviceName: cart-svc
+              servicePort: 80

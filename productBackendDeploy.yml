@@ -1,0 +1,40 @@
+#Product service & pod
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-svc
+  labels:
+    app: shop
+    name: product
+    tier: backend
+spec:
+  selector:
+    app: shop
+    name: product
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: rest-api-port
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: product-pod
+  labels:
+    app: shop
+    name: product
+    tier: backend
+spec:
+  containers:
+    - name: product
+      image: davidgfolch/shop-product:latest
+      ports:
+        - containerPort: 8081
+          name: rest-api-port
+      env:
+      - name: SPRING_PROFILES_ACTIVE
+        value: "prod"
+      - name: MONGO_IP
+        value: product-mongo-svc

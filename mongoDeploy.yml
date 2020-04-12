@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-mongo-svc
+  labels:
+    app: shop
+    name: mongo
+    tier: backend
+spec:
+  selector:
+    app: shop
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+#  type: ClusterIP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: product-mongo-pod
+  labels:
+    app: shop
+    name: mongo
+    tier: backend
+spec:
+  containers:
+    - name: product-mongo
+      image: mongo
+      #https://hub.docker.com/r/bitnami/mongodb/
+#      image: bitnami/mongodb:latest
+      ports:
+        - containerPort: 27017
+      env:
+        #mongo image config
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: "admin"
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: "password"
+        #https://github.com/docker-library/mongo/issues/329
+#        - name: MONGO_USERDB_ADMIN_USERNAME
+#          value: "admin"
+#        - name: MONGO_USERDB_ADMIN_PASSWORD
+#          value: "password"
+#        - name: MONGO_USERDB_ADMIN_DATABASE
+#          value: "shopDb"
+
+
+        #bitnami image config
+#        - name: MONGO_INITDB_DATABASE
+#          value: "shopDb"
+#        - name: MONGO_INITDB_ROOT_USERNAME
+#          value: "admin"
+#        - name: MONGO_INITDB_ROOT_PASSWORD
+#          value: "password"
+
+#        - name: MONGODB_ADMIN_USERNAME
+#          value: "admin"
+#        - name: MONGODB_ADMIN_PASSWORD
+#          value: "password"
+#        - name: MONGODB_ROOT_PASSWORD
+#          value: "password"
+#        - name: MONGODB_USERNAME
+#          value: "backend"
+#        - name: MONGODB_PASSWORD
+#          value: "backendPassword"
+#        - name: MONGODB_DATABASE
+#          value: "productsCollection"

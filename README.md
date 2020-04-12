@@ -1,0 +1,64 @@
+# Kubernetes
+
+## Dockerhub
+
+First steps:
+- build projects (see respective readme's)
+- create repositories in [dockerHub](https://hub.docker.com/repository/create):  `shop-cart`, `shop-product` & `shop-product-mongo` 
+
+```shell script
+docker login
+docker tag techtests/shopcart:latest davidgfolch/shop-cart:latest
+docker tag techtests/shopproduct:latest davidgfolch/shop-product:latest
+docker tag mongo:latest davidgfolch/shop-product-mongo:latest
+docker push davidgfolch/shop-cart
+docker push davidgfolch/shop-product
+docker push davidgfolch/shop-product-mongo
+```
+
+## Minikube setup
+Enable [ingress addon](https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/) on minikube,
+ or see the generic [documentation for other platforms](https://kubernetes.github.io/ingress-nginx/deploy/)
+
+    minikube addons enable ingress
+    kubectl get pods -n kube-system
+
+## Deploy on kubernetes
+
+```shell script
+kubectl delete all --all
+kubectl delete ingress shop-ingress
+
+kubectl create -f deployment.yml
+# or
+kubectl apply -f deployment.yml
+```
+
+Examine application deployment:
+```shell script
+kubectl get all
+kubectl get ingress
+kubectl describe service shop
+kubectl describe pod shop-product
+kubectl describe ingress shop-ingress
+
+# see logs
+kubectl logs --follow shop-cart
+kubectl logs --follow shop-product
+kubectl logs --follow shop-product-mongo
+
+# execute command in container
+kubectl exec -it shop-product-mongo -- WhatEverLlinuxCommand
+# debugging ingress
+kubectl get pods -n kube-system
+kubectl logs --follow nginx-ingress-controller-6fc5bcc8c9-bcmb9 -n kube-system
+
+
+minikube dashboard
+```
+
+## Run front-end application
+
+Front-end is outside of kubernetes at the moment, or you can set simply `localhost`:
+    
+    REACT_APP_BACK_END_SERVER_IP=<ingressIp> yarn start
