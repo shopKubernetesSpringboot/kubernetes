@@ -1,3 +1,12 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority-nonpreempting
+value: 1000000
+preemptionPolicy: Never
+globalDefault: false
+description: "This priority class will not cause other pods to be preempted."
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -27,7 +36,8 @@ metadata:
 spec:
   containers:
     - name: product-mongo
-      image: mongo
+#      image: mongo
+      image: davidgfolch/shop-product-mongo:latest
       #https://hub.docker.com/r/bitnami/mongodb/
 #      image: bitnami/mongodb:latest
       ports:
@@ -38,6 +48,9 @@ spec:
           value: "admin"
         - name: MONGO_INITDB_ROOT_PASSWORD
           value: "password"
+        - name: MONGO_INITDB_DATABASE
+          value: "admin"
+  priorityClassName: high-priority-nonpreempting
         #https://github.com/docker-library/mongo/issues/329
 #        - name: MONGO_USERDB_ADMIN_USERNAME
 #          value: "admin"
@@ -66,4 +79,4 @@ spec:
 #        - name: MONGODB_PASSWORD
 #          value: "backendPassword"
 #        - name: MONGODB_DATABASE
-#          value: "productsCollection"
+#          value: "productDb"

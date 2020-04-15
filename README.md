@@ -57,6 +57,40 @@ kubectl logs --follow nginx-ingress-controller-6fc5bcc8c9-bcmb9 -n kube-system
 minikube dashboard
 ```
 
+### Debuging nginx ingress
+
+    kubectl get pods -n kube-system
+    kubectl get deployment -n kube-system nginx-ingress-controller -o yaml > nginx.tmp.yaml
+    nano nginx.tmp.yaml
+        spec:
+          containers:
+          - args:
+            - --v=5
+    kubectl apply -f nginx.tmp.yaml -n kube-system
+
+## Mongo data init
+
+Dump from existing data
+    
+    #dump (binary)
+    kubectl exec -it product-mongo-pod -- sh -c 'exec mongodump -u admin -p password --authenticationDatabase=admin -d productDb --archive' > mongo-dump-all-collections.archive
+    #export (json format)
+    kubectl exec -it product-mongo-pod -- sh -c 'exec mongoexport -u admin -p password --authenticationDatabase=admin --db=productDb --collection=product --out=out.json'
+    kubectl exec -it product-mongo-pod -- sh -c 'exec cat out.json' > mongo-export-all-collections.json
+    kubectl exec -it product-mongo-pod -- sh -c 'exec mongoimport -u admin -p password --authenticationDatabase=admin --db=productDb --collection=product --type json --file /out.json'
+
+    
+Mongo shell:
+https://docs.mongodb.com/manual/tutorial/write-scripts-for-the-mongo-shell/
+
+    kubectl exec -it product-mongo-pod -- sh
+    mongo -u admin -p password 
+    show dbs
+    use productDb
+    show collections
+    db.product.find()
+    
+    
 ## Run front-end application
 
 Front-end is outside of kubernetes at the moment, or you can set simply `localhost`:

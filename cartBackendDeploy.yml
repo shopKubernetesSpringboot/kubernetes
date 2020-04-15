@@ -9,6 +9,9 @@ metadata:
     tier: backend
 spec:
   sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 120
   selector:
     app: shop
     name: cart

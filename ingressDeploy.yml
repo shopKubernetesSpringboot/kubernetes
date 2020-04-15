@@ -1,8 +1,8 @@
 #Main ingress
 #https://kubernetes.io/docs/concepts/services-networking/ingress/
-#todo session dont work with ingress, seems that it has to be implemented with loadBalance service, but how mix with uri proxying?
 #https://stackoverflow.com/questions/59272484/sticky-sessions-on-kubernetes-cluster
 #https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
+#todo (cors) cart post dont work with ingress
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -10,14 +10,69 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-name: "session"
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-name: session
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
     nginx.ingress.kubernetes.io/enable-cors: "true"
+#    nginx.ingress.kubernetes.io/cors-allow-origin: "$http_origin"
     nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "X-XSRF-TOKEN,Accept,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+#    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: X-XSRF-TOKEN,Accept,Accept-Encoding,Accept-Language,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,Origin,Connection,Content-Length,Content-Type,Host,Referer,User-Agent
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+#    nginx.ingress.kubernetes.io/configuration-snippet: |
+#      more_set_headers "Access-Control-Allow-Origin: $http_origin";
     nginx.ingress.kubernetes.io/session-cookie-path: /cart
+#    nginx.ingress.kubernetes.io/auth-type: "basic"
+#    nginx.ingress.kubernetes.io/satisfy: "any"
+
+#    nginx.ingress.kubernetes.io/http-snippet: |
+#      # CORS start
+#      map $http_origin $allow_origin {
+#        hostnames;
+#        default "";
+#        *.example.com "$http_origin";
+#        *.docker "$http_origin";
+#        *.invalid "$http_origin";
+#        *.localhost "$http_origin";
+#      }
+#      map $allow_origin $cors_allow_credentials {
+#        default "true";
+#        "" "";
+#      }
+#      map $request_method $cors_method {
+#        default "allowed";
+#        "OPTIONS" "preflight";
+#      }
+#      map $cors_method $cors_max_age {
+#        default "";
+#        "preflight" 900;
+#      }
+#      map $cors_method $cors_allow_methods {
+#        default "";
+#        "preflight" "GET, PUT, POST, DELETE, PATCH, OPTIONS";
+#      }
+#      map $cors_method $cors_allow_headers {
+#        default "";
+#        "preflight" "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization";
+#      }
+#      # CORS end
+#
+#    nginx.ingress.kubernetes.io/location-snippet: |
+#      # CORS start
+#      more_set_headers 'Access-Control-Allow-Origin: $allow_origin';
+#      more_set_headers 'Access-Control-Allow-Credentials: $cors_allow_credentials';
+#      more_set_headers 'Access-Control-Allow-Methods: $cors_allow_methods';
+#      more_set_headers 'Access-Control-Allow-Headers: $cors_allow_headers';
+#      more_set_headers 'Access-Control-Max-Age: $cors_max_age';
+#      more_set_headers 'Vary: Origin';
+#
+#      if ($request_method = 'OPTIONS') {
+#          more_set_headers 'Content-Length: 0';
+#          more_set_headers 'Content-Type: text/plain';
+#          return 204;
+#      }
+#      # CORS end
 spec:
   rules:
     - http:

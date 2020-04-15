@@ -59,9 +59,9 @@ else
   case "$1" in
   "all")
     echo "Redeploying all..."
+    mongo
     ingress
     backend
-    mongo
     ;;
   "ingress")
     echo "Redeploying ingress..."
